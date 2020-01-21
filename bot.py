@@ -1,8 +1,8 @@
 import asyncio
 from telethon import TelegramClient, events
 import logging
-from code.log import Log
-from code.config import API_ID, API_HASH
+from log import Log
+from config import API_ID, API_HASH
 
 # updates need not to crush
 logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s',
@@ -12,7 +12,7 @@ logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s'
 log = Log('log.txt')
 
 # log in
-client = TelegramClient('anon', API_ID, API_HASH)
+client = TelegramClient('bot', API_ID, API_HASH)
 log.log('Connected')
 
 # code info

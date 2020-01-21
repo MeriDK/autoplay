@@ -13,7 +13,7 @@
 2. Залогінтесь на https://my.telegram.org/apps
 3. Створіть новий апп або зайдіть в старий якщо робили це раніше
 4. Скопіюйте App api_id та api_hash
-5. Відкрийте файл config.py та вставте api_id з api_hash
+5. Відкрийте файл config.py та вставте api_id з api_hash\
 Приклад:
 > API_ID = 123456\
 > API_HASH = '1234567890abcdefghijklmnopqrstuv'

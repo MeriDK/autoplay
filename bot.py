@@ -112,8 +112,8 @@ async def main():
 
     await asyncio.gather(
         walk(),
-        sleep_and_bonus()
-        # eat()
+        sleep_and_bonus(),
+        eat()
     )
 
 with client:

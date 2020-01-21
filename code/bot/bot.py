@@ -1,8 +1,8 @@
 import asyncio
 from telethon import TelegramClient, events
 import logging
-from log import Log
-from config import API_ID, API_HASH
+from code.log import Log
+from code.config import API_ID, API_HASH
 
 # updates need not to crush
 logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s',
@@ -15,12 +15,12 @@ log = Log('log.txt')
 client = TelegramClient('anon', API_ID, API_HASH)
 log.log('Connected')
 
-# bot info
+# code info
 bot_username = 'WorldDogs_bot'
 
 time_to_walk = 1
 time_to_sleep = 1
-time_to_eat = 12 * 3600 + 60    # 12 hours after bot start
+time_to_eat = 12 * 3600 + 60    # 12 hours after code start
 eat_counter = 2
 
 
@@ -112,8 +112,8 @@ async def main():
 
     await asyncio.gather(
         walk(),
-        sleep_and_bonus(),
-        eat()
+        sleep_and_bonus()
+        # eat()
     )
 
 with client:

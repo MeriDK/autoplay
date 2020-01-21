@@ -1,11 +1,11 @@
 import asyncio
 from telethon import TelegramClient, events
 import logging
-from log import Log
-from config import API_ID, API_HASH
+from code.config import API_ID, API_HASH
+from code.log import Log
 
 # set how many times you want to go to arena
-arena_counter = 2
+arena_counter = 1
 
 # updates need not to crush
 logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s',
@@ -18,7 +18,7 @@ log = Log('log.txt')
 client = TelegramClient('anon', API_ID, API_HASH)
 log.log('Connected')
 
-# bot info
+# code info
 bot_username = 'WorldDogs_bot'
 
 

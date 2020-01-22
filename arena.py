@@ -5,7 +5,7 @@ from config import API_ID, API_HASH
 from log import Log
 
 # set how many times you want to go to arena
-arena_counter = 1
+arena_counter = 15
 
 # updates need not to crush
 logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s',

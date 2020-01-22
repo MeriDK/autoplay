@@ -107,13 +107,20 @@ async def eat():
     await asyncio.create_task(eat())
 
 
+# clan arena with Vit
+@client.on(events.NewMessage(from_users=bot_username, pattern=r'Игрок 🐸ToadKiller приглашает тебя принять '))
+async def arena_handler(event):
+    await asyncio.sleep(5)
+    await event.click()
+
+
 async def main():
     await set_time()
 
     await asyncio.gather(
         walk(),
-        sleep_and_bonus(),
-        eat()
+        sleep_and_bonus()
+        # eat()
     )
 
 with client:

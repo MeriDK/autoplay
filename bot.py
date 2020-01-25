@@ -22,6 +22,7 @@ time_to_walk = 1
 time_to_sleep = 1
 time_to_eat = 12 * 3600 + 60    # 12 hours after code start
 eat_counter = 2
+clan_arena_check = True
 
 
 # function to send messages
@@ -100,18 +101,24 @@ async def eat():
 
     global eat_counter
     await send(['🏯 Квартал героев', '🏠 Дом Героя', f'🍗 Перекусить (Осталось {eat_counter} раз)'])
-    await send(['◀️ Назад', '◀️ Назад]'], delay=2)
+    await send(['◀️ Назад', '◀️ Назад'], delay=2)
 
     eat_counter = 1 if eat_counter == 2 else 1
 
     await asyncio.create_task(eat())
 
 
-# clan arena with Vit
-@client.on(events.NewMessage(from_users=bot_username, pattern=r'Игрок 🐸ToadKiller приглашает тебя принять '))
+# clan arena
+@client.on(events.NewMessage(from_users=bot_username, pattern=r'Игрок .+ приглашает тебя принять'))
 async def arena_handler(event):
-    await asyncio.sleep(5)
-    await event.click()
+    print(event)
+    global clan_arena_check
+    if clan_arena_check:
+        clan_arena_check = False
+        await asyncio.sleep(3)
+        print(await event.click())
+        await asyncio.sleep(3600)     # sleep for 1 hour
+        clan_arena_check = True
 
 
 async def main():

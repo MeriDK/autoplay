@@ -100,7 +100,7 @@ async def eat():
 
     global eat_counter
     await send(['🏯 Квартал героев', '🏠 Дом Героя', f'🍗 Перекусить (Осталось {eat_counter} раз)'])
-    await send(['◀️ Назад', '◀️ Назад]'], delay=2)
+    await send(['◀️ Назад', '◀️ Назад'], delay=2)
 
     eat_counter = 1 if eat_counter == 2 else 1
 

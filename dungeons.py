@@ -19,8 +19,7 @@ log.log('Connected')
 bot_username = 'WOD_dungeon_bot'
 
 boss_phrases = ['гиганта', 'верзилу', 'чудовище', 'чудище', 'монстра']
-move_phrases = ['Сделать шаг', 'Подойти к боссу', 'Отойти немного', 'Перепрыгнуть лужу лавы']
-die = '🌀🌀 БЕЗДЕЙСТВУЙТЕ ИЛИ УМРИТЕ 🌀🌀'
+move_phrases = ['Сделать шаг', 'Подойти к боссу', 'Отойти', 'Перепрыгнуть лужу лавы']
 
 check_die = False
 
@@ -39,37 +38,49 @@ def check_move_phrase(text):
     return False
 
 
-async def check_in_answer(buttons):
-    for button in [button for row in buttons for button in row]:
-        if 'в ответ' in button.text:
+async def get_buttons(event):
+    await asyncio.sleep(1)
+    buttons = await event.get_buttons()
+    buttons = [button for row in buttons for button in row]
+    return buttons
+
+
+@client.on(events.NewMessage(from_users=bot_username, pattern=r'🌀 Отречение 🌀\nТвой ход, 🐸MeriDK'))
+async def main(event):
+    buttons = await get_buttons(event)
+
+    for button in buttons:
+        if not check_boss_phrase(button.text):
             await button.click()
             log.log(button.text)
-            return True
-    return False
+            break
+
+
+@client.on(events.NewMessage(from_users=bot_username, pattern=r'😡 Твои ноги горят 😡\nТвой ход, 🐸MeriDK'))
+async def main(event):
+    buttons = await get_buttons(event)
+
+    for button in buttons:
+        if check_move_phrase(button.text):
+            await button.click()
+            log.log(button.text)
 
 
 @client.on(events.NewMessage(from_users=bot_username, pattern=r'Твой ход, 🐸MeriDK'))
 async def main(event):
-    await asyncio.sleep(1)
-    buttons = await event.get_buttons()
+    buttons = await get_buttons(event)
 
-    # check for phrase with 'in answer'
-    if not await check_in_answer(buttons):
-        move = False
+    # response
+    for button in buttons:
+        if 'в ответ' in button.text:
+            await button.click()
+            log.log(button.text)
+            return
 
-        # check for possibility to move
-        for button in [button for row in buttons for button in row]:
-            if check_move_phrase(button.text):
-                await button.click()
-                log.log(button.text)
-                move = True
-
-        # attack boss
-        if not move:
-            for button in [button for row in buttons for button in row]:
-                if check_boss_phrase(button.text):
-                    await button.click()
-                    log.log(button.text)
+    for button in buttons:
+        if check_boss_phrase(button.text):
+            await button.click()
+            log.log(button.text)
 
 
 client.start()

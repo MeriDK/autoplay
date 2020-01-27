@@ -22,7 +22,9 @@ time_to_walk = 1
 time_to_sleep = 1
 time_to_eat = 12 * 3600 + 60    # 12 hours after code start
 eat_counter = 2
+
 clan_arena_check = True
+busy_check = False
 
 
 # function to send messages
@@ -50,12 +52,18 @@ async def set_time():
 async def walk():
     await asyncio.sleep(time_to_walk)
 
+    global busy_check
+    while busy_check:
+        await asyncio.sleep(60)
+
+    busy_check = True
     log.log('Went for a walk')
 
     await send(['⛩ Городские ворота', '🐾 Прогулка'])
     await send('🌲 В мрачных землях 🌲', delay=10)
     await send(['🐾 Прогулка', '🌲 В мрачных землях 🌲', '◀️ Назад'])
 
+    busy_check = False
     await asyncio.create_task(walk())
 
 
@@ -74,6 +82,11 @@ async def walk_handler(event):
 async def sleep_and_bonus():
     await asyncio.sleep(time_to_sleep)
 
+    global busy_check
+    while busy_check:
+        await asyncio.sleep(60)
+
+    busy_check = True
     log.log('Went to sleep and get daily bonus')
 
     await send(['🏯 Квартал героев', '🏠 Дом Героя'])
@@ -81,6 +94,7 @@ async def sleep_and_bonus():
     await send(['◀️ Назад', '◀️ Назад', '🏪 Торговый квартал', '🎲 Игорный дом', '🎁 Ежедневный бонус',
                 '◀️ Назад', '◀️ Назад'])
 
+    busy_check = False
     await asyncio.create_task(sleep_and_bonus())
 
 
@@ -99,11 +113,18 @@ async def sleep_handler(event):
 async def eat():
     await asyncio.sleep(time_to_eat)
 
+    global busy_check
+    while busy_check:
+        await asyncio.sleep(60)
+
+    busy_check = True
+
     global eat_counter
     await send(['🏯 Квартал героев', '🏠 Дом Героя', f'🍗 Перекусить (Осталось {eat_counter} раз)'])
     await send(['◀️ Назад', '◀️ Назад'], delay=2)
 
     eat_counter = 1 if eat_counter == 2 else 1
+    busy_check = False
 
     await asyncio.create_task(eat())
 
@@ -111,14 +132,37 @@ async def eat():
 # clan arena
 @client.on(events.NewMessage(from_users=bot_username, pattern=r'Игрок .+ приглашает тебя принять'))
 async def arena_handler(event):
-    print(event)
     global clan_arena_check
     if clan_arena_check:
         clan_arena_check = False
+
         await asyncio.sleep(3)
-        print(await event.click())
-        await asyncio.sleep(3600)     # sleep for 1 hour
+        res = await event.click()
+        if res.message is None:
+            await asyncio.sleep(3600)     # sleep for 1 hour
+
         clan_arena_check = True
+
+
+# busy check for dungeons
+@client.on(events.NewMessage(from_users=bot_username, pattern=r'Пожалуйста, ждите...'))
+async def arena_handler(event):
+    global busy_check
+    busy_check = True
+
+
+# busy check for dungeons
+@client.on(events.NewMessage(from_users=bot_username, pattern=r'(Вы выиграли|Вам возвращена энергия|Отменено!)'))
+async def arena_handler(event):
+    global busy_check
+    busy_check = False
+
+
+# busy check for arena
+@client.on(events.NewMessage(from_users=bot_username, pattern=r'⚔️ Арена'))
+async def arena_handler(event):
+    global busy_check
+    busy_check = False if busy_check else True
 
 
 async def main():
@@ -126,8 +170,8 @@ async def main():
 
     await asyncio.gather(
         walk(),
-        sleep_and_bonus()
-        # eat()
+        sleep_and_bonus(),
+        eat()
     )
 
 with client:

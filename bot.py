@@ -17,14 +17,17 @@ log.log('Connected')
 
 # code info
 bot_username = 'WorldDogs_bot'
+bot_zhaba = 'jabkvabot'
 
 time_to_walk = 1
 time_to_sleep = 1
 time_to_eat = 12 * 3600 + 60    # 12 hours after code start
+time_update_clan = 4 * 3600 + 60    # each hour
 eat_counter = 2
 
 clan_arena_check = True
 busy_check = False
+clan_check = False
 
 
 # function to send messages
@@ -159,10 +162,53 @@ async def arena_handler(event):
 
 
 # busy check for arena
-@client.on(events.NewMessage(from_users=bot_username, pattern=r'⚔️ Арена'))
+@client.on(events.NewMessage(from_users=bot_username, pattern=r'Ваш противник:'))
 async def arena_handler(event):
     global busy_check
-    busy_check = False if busy_check else True
+    busy_check = True
+
+
+# busy check for arena
+@client.on(events.NewMessage(from_users=bot_username, pattern=r'(За победу ты награждаешься|За участие ты получил)'))
+async def arena_handler(event):
+    global busy_check
+    busy_check = False
+
+
+# clan users updater
+async def clan_update():
+    await asyncio.sleep(time_update_clan)
+
+    global busy_check
+    while busy_check:
+        await asyncio.sleep(60)
+    busy_check = True
+
+    global clan_check
+    clan_check = True
+
+    await send(['⛩ Городские ворота', '👥 Клановая крепость'])
+    await asyncio.sleep(10)
+    await send('◀️ Назад')
+
+    busy_check = False
+    clan_check = False
+
+    await asyncio.create_task(clan_update())
+
+
+@client.on(events.NewMessage(from_users=bot_username, pattern=r'⚔️ Жабодержава'))
+async def walk_handler(event):
+    if clan_check:
+        await asyncio.sleep(1)
+        await event.click()
+        await asyncio.sleep(1)
+        msg = await client.get_messages(bot_username, ids=event.message.id)
+        await msg.forward_to(bot_zhaba)
+        while not (await msg.buttons[0][1].click()).message:
+            await asyncio.sleep(1)
+            msg = await client.get_messages(bot_username, ids=event.message.id)
+            await msg.forward_to(bot_zhaba)
 
 
 async def main():
@@ -171,7 +217,8 @@ async def main():
     await asyncio.gather(
         walk(),
         sleep_and_bonus(),
-        eat()
+        eat(),
+        clan_update()
     )
 
 with client:
